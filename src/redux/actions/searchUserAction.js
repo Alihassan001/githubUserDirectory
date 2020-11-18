@@ -25,12 +25,10 @@ const failure = () => ({
 
 export const searchUserAction = (name) => {
     return async (dispatch, getState) => {
-        // if (getState().searchUserReducer.searchUserIsLoading) return
-        // dispatch(start())
+        if (getState().searchUserReducer.searchUserIsLoading) return dispatch(start())
         try {
             const response = await searchUser(name)
             const result = await response.json()
-            console.log("findUserAction -> result", result)
             
             if (response.status === 200) {
                 dispatch(success({

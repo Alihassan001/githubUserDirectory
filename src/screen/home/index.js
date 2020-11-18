@@ -14,18 +14,18 @@ import AntDesign from 'react-native-vector-icons/AntDesign'
 
 //Styling
 import { styles } from './style'
-
 function Home(props) {
     const [isModal, handleModal] = useState(false)
     const [value, setValue] = useState('')
-    const { 
-        actions: { userAction, findUserAction, searchUserAction }, 
-        userReducer: { users }, 
+    const [typingTimeout, setTypingTimeout] = useState(0)
+
+    const {
+        actions: { userAction, findUserAction, searchUserAction },
+        userReducer: { users },
         findUserReducer: { user },
         searchUserReducer
     } = props
 
-    console.log(searchUserReducer.user)    
     useEffect(() => {
         userAction()
     }, [])
@@ -36,8 +36,13 @@ function Home(props) {
     }
 
     const search = (name) => {
+        if (typingTimeout) {
+            clearTimeout(typingTimeout)
+        }
+
         setValue(name)
-        searchUserAction(name)
+        setTypingTimeout(setTimeout(() => searchUserAction(name), 1000))
+
     }
 
     return (
@@ -46,17 +51,18 @@ function Home(props) {
                 <AntDesign name='github' style={styles.title} />
                 <Text style={styles.title}>Git Hub Users Directory</Text>
             </View>
-            <MyInput value={value} onChange={e => search(e)}/>
-            {searchUserReducer.user.id ? 
-            <List user={(name) => specific(name)} data={[searchUserReducer.user]} />
-            : 
-            <List user={(name) => specific(name)} data={users} /> 
+            <MyInput value={value} onChange={e => search(e)} />
+            {user.isLoading || searchUserReducer.searchUserIsLoading ? <Text>Loading...</Text> :
+                searchUserReducer.user.id ?
+                    <List user={(name) => specific(name)} data={[searchUserReducer.user]} />
+                    :
+                    <List user={(name) => specific(name)} data={users} />
             }
             <Modal isVisible={isModal}>
-                {user ?
+                {!user.isLoading ?
                     <View style={styles.modalContainer}>
                         <TouchableOpacity onPress={() => handleModal(!isModal)}>
-                            <AntDesign name='closecircle' size={24} style={styles.icon}/>
+                            <AntDesign name='closecircle' size={24} style={styles.icon} />
                         </TouchableOpacity>
                         <Image source={{ uri: user.avatar_url }} style={styles.userImage} />
                         <Text style={styles.modalText}>Name: {user.name}</Text>
@@ -64,7 +70,7 @@ function Home(props) {
                         <Text style={styles.modalText}>No of follower: {user.followers}</Text>
                         <Text style={styles.modalText}>No of follwing: {user.following}</Text>
                     </View> :
-                    <View style={{flex: 1, backgroundColor: '#fff', alignItems: 'center' }}><Text>Loading...</Text></View>
+                    <View style={{ flex: 1, backgroundColor: '#fff', alignItems: 'center' }}><Text>Loading...</Text></View>
                 }
             </Modal>
         </View>
