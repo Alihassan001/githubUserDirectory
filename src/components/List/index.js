@@ -9,7 +9,7 @@ export default function List(props) {
         data,
         user = () => { }
     } = props
-
+    
     const renderItem = ({ item: { avatar_url, login, url } }) => (
         <TouchableOpacity style={styles.itemContainer} onPress={() => user(login)}>
             <Image source={{ uri: avatar_url }} style={styles.itemImg} />
@@ -25,7 +25,6 @@ export default function List(props) {
                 renderItem={(item) => renderItem(item)}
                 keyExtractor={item => item.id}
                 numColumns={2}
-
             />
         </View>
     )

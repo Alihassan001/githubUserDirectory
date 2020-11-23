@@ -30,7 +30,6 @@ export const findUserAction = (name) => {
         try {
             const response = await searchUser(name)
             const result = await response.json()
-            console.log("findUserAction -> result", result)
             
             if (response.status === 200) {
                 dispatch(success({
